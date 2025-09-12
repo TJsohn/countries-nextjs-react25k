@@ -27,7 +27,7 @@ const Countries = () => {
 
   return (
     <div>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} direction="row" justifyContent="center">
         {countries.map((country) => (
           <Card key={country.name.common}>
             <CardMedia component="img" image={country.flags.svg} />
