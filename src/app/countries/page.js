@@ -1,8 +1,9 @@
 "use client";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "@/lib/features/countries/countriesSlice";
-import { Card, Grid, CardContent, Typography, CardMedia } from "@mui/material";
+import { Card, Grid, CardContent, Typography } from "@mui/material";
+import Image from "next/image";
+import { useEffect } from "react";
 
 const Countries = () => {
   const countries = useSelector((state) => state.countries.countries);
@@ -19,27 +20,38 @@ const Countries = () => {
   }
 
   const getCurrencies = (country) => {
-    if (!country.currencies) return "No currency data";
+    if (!country.currencies) return "N/A";
     return Object.values(country.currencies)
       .map((currency) => `${currency.name} (${currency.symbol})`)
       .join(", ");
   };
 
   return (
-    <div>
+    <>
       <Grid container spacing={2} direction="row" justifyContent="center">
         {countries.map((country) => (
-          <Card key={country.name.common}>
-            <CardMedia component="img" image={country.flags.svg} />
+          <Card
+            key={country.name.common}
+            sx={{ width: "200px", height: "200px" }}
+          >
             <CardContent>
-              <Typography>{country.name.common}</Typography>
-              <Typography>{country && getCurrencies(country)}</Typography>
-              <Typography>{country.population}</Typography>
+              <Image
+                width={100}
+                height={100}
+                style={{ objectFit: "cover" }}
+                src={country.flags.svg}
+                alt={country.name.common}
+              />
+              <Typography variant="h6">{country.name.common}</Typography>
+              <Typography variant="body1">{country.population}</Typography>
+              <Typography variant="body1">
+                {country && getCurrencies(country)}
+              </Typography>
             </CardContent>
           </Card>
         ))}
       </Grid>
-    </div>
+    </>
   );
 };
 

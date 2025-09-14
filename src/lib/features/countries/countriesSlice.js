@@ -13,7 +13,6 @@ export const fetchCountries = createAsyncThunk(
   async () => {
     const response = await axios.get(api);
     console.log("Status: ", response.status);
-    console.log("Errors:", response.error);
     console.log("Response: ", response.data);
     return response.data;
   }
