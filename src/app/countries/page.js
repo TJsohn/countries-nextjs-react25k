@@ -1,13 +1,28 @@
 "use client";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "@/lib/features/countries/countriesSlice";
-import { Card, Grid, CardContent, Typography } from "@mui/material";
+import {
+  Card,
+  Grid,
+  CardContent,
+  Typography,
+  CardActionArea,
+} from "@mui/material";
 import Image from "next/image";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const Countries = () => {
   const countries = useSelector((state) => state.countries.countries);
   const dispatch = useDispatch(); // trigger the action
+  const router = useRouter();
+
+  console.log("encodeURIComponent: ", encodeURIComponent("Côte d'Ivoire"));
+
+  const handleCountryClick = (countryName) => {
+    const slug = countryName.toLowerCase().replace(/\s+/g, "-");
+    router.push(`/countries/${encodeURIComponent(slug)}`);
+  };
 
   useEffect(() => {
     dispatch(fetchCountries());
@@ -34,20 +49,24 @@ const Countries = () => {
             key={country.name.common}
             sx={{ width: "200px", height: "200px" }}
           >
-            <CardContent>
-              <Image
-                width={100}
-                height={100}
-                style={{ objectFit: "cover" }}
-                src={country.flags.svg}
-                alt={country.name.common}
-              />
-              <Typography variant="h6">{country.name.common}</Typography>
-              <Typography variant="body1">{country.population}</Typography>
-              <Typography variant="body1">
-                {country && getCurrencies(country)}
-              </Typography>
-            </CardContent>
+            <CardActionArea
+              onClick={() => handleCountryClick(country.name.common)}
+            >
+              <CardContent>
+                <Image
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "cover" }}
+                  src={country.flags.svg}
+                  alt={country.name.common}
+                />
+                <Typography variant="h6">{country.name.common}</Typography>
+                <Typography variant="body1">{country.population}</Typography>
+                <Typography variant="body1">
+                  {country && getCurrencies(country)}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
           </Card>
         ))}
       </Grid>
