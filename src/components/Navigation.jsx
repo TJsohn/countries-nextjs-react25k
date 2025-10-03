@@ -26,10 +26,20 @@ const Navigation = ({ children }) => {
             </Button>
             {user && (
             <Button color="inherit" onClick={()=>signOut()}>Logout</Button>
+            
         )}
+        {
+  user && (
+    <Button color="inherit" onClick={() => router.push("/profile")}>
+      Profile
+    </Button>
+  )
+}
+        
         {!user && (
             <Button color="inherit" onClick={()=>router.push("/login")}>Login</Button>
         )}
+        
         <ThemeToggle />
         </Toolbar>
     </AppBar>

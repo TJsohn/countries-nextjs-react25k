@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { CssBaseline } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -165,46 +165,64 @@ const darkTheme = createTheme({
 });
 
 export function CustomThemeProvider({ children }) {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem("theme-mode");
-        if (savedTheme) {
-            setIsDarkMode(savedTheme === "dark");
-        } else {
-            // Check system preference:
-            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-            setIsDarkMode(prefersDark);
-        }
-    }, []);
+  useEffect(() => {
+    // Mark as hydrated first
+    setIsHydrated(true);
 
-    const toggleTheme = () => {
-        setIsDarkMode((prev) => !prev);
-        localStorage.setItem("theme-mode", !isDarkMode ? "dark" : "light");
+    const savedTheme = localStorage.getItem("theme-mode");
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === "dark");
+    } else {
+      // Check system preference:
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      setIsDarkMode(prefersDark);
     }
+  }, []);
 
-    const currentTheme = isDarkMode ? darkTheme : lightTheme;
-
-    const value={
-        isDarkMode,
-        toggleTheme,
-        theme: currentTheme,
+  // Save theme preference when it changes
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem("theme-mode", isDarkMode ? "dark" : "light");
     }
-    
-    return (
-        <ThemeContext.Provider value={value}>
-            <ThemeProvider theme={currentTheme}>
-                <CssBaseline />
-                {children}
-            </ThemeProvider>
-        </ThemeContext.Provider>
-    )
+  }, [isDarkMode, isHydrated]);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+
+  // Use light theme as default until hydrated to prevent mismatch
+  const currentTheme = isHydrated
+    ? isDarkMode
+      ? darkTheme
+      : lightTheme
+    : lightTheme;
+
+  const value = {
+    isDarkMode: isHydrated ? isDarkMode : false,
+    toggleTheme,
+    theme: currentTheme,
+    isHydrated,
+  };
+
+  return (
+    <ThemeContext.Provider value={value}>
+      <ThemeProvider theme={currentTheme}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
-    const context = useContext(ThemeContext);
-    if (context === undefined) {
-        throw new Error("useTheme must be used within a Theme Provider");
-    }
-    return context;
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a Theme Provider");
+  }
+  return context;
 }
