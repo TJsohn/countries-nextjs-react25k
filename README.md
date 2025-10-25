@@ -105,3 +105,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Additional Libraries & Justification
+
+- **Next.js**: Used for file-based routing, server-side rendering, and API routes. It simplifies development and improves performance compared to plain React.
+- **axios**: Used for HTTP requests to external APIs (e.g., OpenWeather). Chosen for its simple and consistent API.
+- **@fontsource/roboto**: Used to provide the Roboto font for a modern, clean UI consistent with Material-UI design.
+- **recharts**: Used for rendering analytics charts in the favourites analytics feature. Chosen for its ease of use and integration with React.
