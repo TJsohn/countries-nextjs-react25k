@@ -10,8 +10,6 @@ const Login = () => {
 
   const {user} = useAuth();
 
-  console.log("User: ", user);
-
   if (user) {
     return <AuthRedirect />;
   } else {

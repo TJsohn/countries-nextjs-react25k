@@ -9,24 +9,44 @@ const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1976d2",
-      light: "#42a5f5",
-      dark: "#1565c0",
-      contrastText: "#ffffff",
+      main: "#43ea7f", // Vibrant green
+      light: "#7fffd4",
+      dark: "#009e4f",
+      contrastText: "#fff",
     },
     secondary: {
-      main: "#9c27b0",
-      light: "#ba68c8",
-      dark: "#7b1fa2",
-      contrastText: "#ffffff",
+      main: "#ffe066", // Soft yellow
+      light: "#fff9c4",
+      dark: "#ffd600",
+      contrastText: "#222",
+    },
+    info: {
+      main: "#00bcd4",
+      contrastText: "#fff",
+    },
+    success: {
+      main: "#4caf50",
+      contrastText: "#fff",
+    },
+    warning: {
+      main: "#ff9800",
+      contrastText: "#fff",
+    },
+    customPurple: {
+      main: "#8e24aa",
+      contrastText: "#fff",
+    },
+    customGreen: {
+      main: "#43ea7f",
+      contrastText: "#fff",
     },
     background: {
-      default: "#ffffff",
-      paper: "#f5f5f5",
+      default: "#eafbe7", // soft green background
+      paper: "#fffde7",   // light yellow for cards/paper
     },
     text: {
-      primary: "#212121",
-      secondary: "#757575",
+      primary: "#222",
+      secondary: "#555",
     },
   },
   typography: {
@@ -89,24 +109,44 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#90caf9",
-      light: "#e3f2fd",
-      dark: "#42a5f5",
-      contrastText: "#000000",
+      main: "#43ea7f", // Vibrant green
+      light: "#7fffd4",
+      dark: "#009e4f",
+      contrastText: "#222",
     },
     secondary: {
-      main: "#ce93d8",
-      light: "#f3e5f5",
-      dark: "#ab47bc",
-      contrastText: "#000000",
+      main: "#ffe066", // Soft yellow
+      light: "#fff9c4",
+      dark: "#ffd600",
+      contrastText: "#222",
+    },
+    info: {
+      main: "#00bcd4",
+      contrastText: "#fff",
+    },
+    success: {
+      main: "#4caf50",
+      contrastText: "#fff",
+    },
+    warning: {
+      main: "#ff9800",
+      contrastText: "#fff",
+    },
+    customPurple: {
+      main: "#8e24aa",
+      contrastText: "#fff",
+    },
+    customGreen: {
+      main: "#43ea7f",
+      contrastText: "#fff",
     },
     background: {
-      default: "#121212",
-      paper: "#1e1e1e",
+      default: "#1a2b1a", // deep green for dark mode
+      paper: "#232b1a",   // olive/greenish dark for cards/paper
     },
     text: {
-      primary: "#ffffff",
-      secondary: "#b0b0b0",
+      primary: "#fff",
+      secondary: "#bdbdbd",
     },
   },
   typography: {
@@ -195,19 +235,23 @@ export function CustomThemeProvider({ children }) {
     setIsDarkMode((prev) => !prev);
   };
 
-  // Use light theme as default until hydrated to prevent mismatch
-  const currentTheme = isHydrated
-    ? isDarkMode
-      ? darkTheme
-      : lightTheme
-    : lightTheme;
-
   const value = {
     isDarkMode: isHydrated ? isDarkMode : false,
     toggleTheme,
-    theme: currentTheme,
+    theme: isDarkMode ? darkTheme : lightTheme,
     isHydrated,
   };
+
+  // Only render Material-UI providers after hydration to prevent CSS injection mismatch
+  if (!isHydrated) {
+    return (
+      <ThemeContext.Provider value={value}>
+        {children}
+      </ThemeContext.Provider>
+    );
+  }
+
+  const currentTheme = isDarkMode ? darkTheme : lightTheme;
 
   return (
     <ThemeContext.Provider value={value}>

@@ -1,4 +1,6 @@
 "use client";
+import { useAuth } from "@/app/context/AuthContext";
+import FavouriteButton from "@/components/FavouriteButton";
 import {
   clearSelectedCountry,
   fetchCountries,
@@ -9,6 +11,7 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
   Chip,
   Divider,
@@ -18,7 +21,7 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const CountryPage = () => {
@@ -26,26 +29,25 @@ const CountryPage = () => {
   const { slug } = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { user } = useAuth();
 
   // 2. Get country data from Redux store
   const { selectedCountry, loading, error, countries } = useSelector(
     (state) => state.countries
   );
 
-  console.log("Countries from SinglePage: ", countries);
-
   useEffect(() => {
     if (countries.length === 0) {
       dispatch(fetchCountries());
     }
-  });
+  }, [countries.length, dispatch]);
 
   // 3. Weather state (we'll add this functionality later)
   const [weatherData, setWeatherData] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [weatherError, setWeatherError] = useState(null);
 
-  const fetchWeatherData = async (capital) => {
+  const fetchWeatherData = useCallback(async (capital) => {
     if (!capital) return;
 
     setWeatherLoading(true);
@@ -71,13 +73,13 @@ const CountryPage = () => {
     } finally {
       setWeatherLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (selectedCountry?.capital?.[0]) {
       fetchWeatherData(selectedCountry.capital[0]);
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, fetchWeatherData]);
 
   // 4. Find and set country data from existing store data
   useEffect(() => {
@@ -105,11 +107,89 @@ const CountryPage = () => {
   }, [slug, countries, dispatch]);
 
   // 5. Navigation handler
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     router.push("/countries");
-  };
+  }, [router]);
 
-  // 6. Loading state - only when countries data is being fetched initially
+  // 6. Helper functions for data formatting
+  const getCurrencies = useCallback((country) => {
+    if (!country.currencies) return "N/A";
+    return Object.values(country.currencies)
+      .map((currency) => `${currency.name} (${currency.symbol})`)
+      .join(", ");
+  }, []);
+
+  const getLanguages = useCallback((country) => {
+    if (!country.languages) return "N/A";
+    return Object.values(country.languages).join(", ");
+  }, []);
+
+  const formatPopulation = useCallback((population) => {
+    return new Intl.NumberFormat("en-US").format(population);
+  }, []);
+
+  // 7. Memoized computed values
+  const formattedPopulation = useMemo(
+    () =>
+      selectedCountry ? formatPopulation(selectedCountry.population) : null,
+    [selectedCountry, formatPopulation]
+  );
+
+  const currencyString = useMemo(
+    () => (selectedCountry ? getCurrencies(selectedCountry) : null),
+    [selectedCountry, getCurrencies]
+  );
+
+  const languagesString = useMemo(
+    () => (selectedCountry ? getLanguages(selectedCountry) : null),
+    [selectedCountry, getLanguages]
+  );
+
+  const languageChips = useMemo(() => {
+    if (!languagesString || languagesString === "N/A") return null;
+    return languagesString
+      .split(", ")
+      .map((language, index) => (
+        <Chip
+          key={index}
+          label={language}
+          variant="outlined"
+          size="small"
+          sx={{ mr: 1, mb: 1 }}
+        />
+      ));
+  }, [languagesString]);
+
+  // 8. Bordering countries logic
+  const borderingCountries = useMemo(() => {
+    if (!selectedCountry?.borders || selectedCountry.borders.length === 0) {
+      return [];
+    }
+
+    // Convert border codes (like "USA", "CAN") to full country objects
+    const borderCountries = selectedCountry.borders
+      .map((borderCode) => {
+        const borderCountry = countries.find(
+          (country) =>
+            country.cca3 === borderCode || country.cioc === borderCode
+        );
+        return borderCountry;
+      })
+      .filter(Boolean); // Remove any undefined results
+
+    return borderCountries;
+  }, [selectedCountry, countries]);
+
+  // 9. Navigation handler for border countries
+  const handleBorderCountryClick = useCallback(
+    (countryName) => {
+      const slug = encodeURIComponent(countryName.replace(/\s+/g, "-"));
+      router.push(`/countries/${slug}`);
+    },
+    [router]
+  );
+
+  // 10. Loading state - only when countries data is being fetched initially
   if (loading || countries.length === 0) {
     return (
       <Box
@@ -171,24 +251,7 @@ const CountryPage = () => {
     );
   }
 
-  // 9. Helper functions for data formatting
-  const getCurrencies = (country) => {
-    if (!country.currencies) return "N/A";
-    return Object.values(country.currencies)
-      .map((currency) => `${currency.name} (${currency.symbol})`)
-      .join(", ");
-  };
-
-  const getLanguages = (country) => {
-    if (!country.languages) return "N/A";
-    return Object.values(country.languages).join(", ");
-  };
-
-  const formatPopulation = (population) => {
-    return new Intl.NumberFormat().format(population);
-  };
-
-  // 10. Main component render
+  // 9. Main component render
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
       {/* Back Button */}
@@ -201,11 +264,17 @@ const CountryPage = () => {
         Back to Countries
       </Button>
 
+      {user && (
+        <Box>
+          <FavouriteButton country={selectedCountry} />
+        </Box>
+      )}
+
       {/* Main Content */}
       <Paper elevation={3} sx={{ p: 4 }}>
         <Grid container spacing={4}>
           {/* Flag and Basic Info */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
                 <Box
@@ -221,6 +290,8 @@ const CountryPage = () => {
                       objectFit: "cover",
                       borderRadius: "8px",
                       border: "1px solid #ddd",
+                      width: "auto",
+                      height: "auto",
                     }}
                     src={
                       selectedCountry.flags?.svg || selectedCountry.flags?.png
@@ -239,59 +310,61 @@ const CountryPage = () => {
           </Grid>
 
           {/* Detailed Information */}
-          <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h5" gutterBottom fontWeight={600}>
                   Country Details
                 </Typography>
-                <Divider sx={{ mb: 2 }} />
+                <Divider sx={{ mb: 3 }} />
 
-                <Box display="flex" flexDirection="column" gap={2}>
+                <Box display="flex" flexDirection="column" gap={2.5}>
                   <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Population
                     </Typography>
-                    <Typography variant="body1">
-                      {formatPopulation(selectedCountry.population)}
-                    </Typography>
+                    <Typography variant="h6">{formattedPopulation}</Typography>
                   </Box>
 
                   <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Capital
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="h6">
                       {selectedCountry.capital?.join(", ") || "N/A"}
                     </Typography>
                   </Box>
 
                   <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
                       Languages
                     </Typography>
-                    <Box sx={{ mt: 1 }}>
-                      {getLanguages(selectedCountry)
-                        .split(", ")
-                        .map((language, index) => (
-                          <Chip
-                            key={index}
-                            label={language}
-                            variant="outlined"
-                            size="small"
-                            sx={{ mr: 1, mb: 1 }}
-                          />
-                        ))}
-                    </Box>
+                    <Box>{languageChips}</Box>
                   </Box>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
+        {/* Weather Section */}
         {selectedCountry?.capital?.[0] && (
           <Grid container spacing={4} sx={{ mt: 2 }}>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h5" gutterBottom>
@@ -328,7 +401,7 @@ const CountryPage = () => {
                   {weatherData && !weatherLoading && (
                     <Grid container spacing={3}>
                       {/* Current Weather */}
-                      <Grid item xs={12} md={6}>
+                      <Grid size={{ xs: 12, md: 6 }}>
                         <Box
                           display="flex"
                           flexDirection="column"
@@ -355,29 +428,53 @@ const CountryPage = () => {
                       </Grid>
 
                       {/* Weather Details */}
-                      <Grid item xs={12} md={6}>
-                        <Box display="flex" flexDirection="column" gap={1.5}>
-                          <Box display="flex" justifyContent="space-between">
-                            <Typography variant="body1" fontWeight="bold">
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <Box display="flex" flexDirection="column" gap={2}>
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography
+                              variant="body1"
+                              fontWeight={500}
+                              color="text.secondary"
+                            >
                               Humidity:
                             </Typography>
-                            <Typography variant="body1">
+                            <Typography variant="h6" fontWeight={600}>
                               {weatherData.main.humidity}%
                             </Typography>
                           </Box>
-                          <Box display="flex" justifyContent="space-between">
-                            <Typography variant="body1" fontWeight="bold">
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography
+                              variant="body1"
+                              fontWeight={500}
+                              color="text.secondary"
+                            >
                               Wind Speed:
                             </Typography>
-                            <Typography variant="body1">
+                            <Typography variant="h6" fontWeight={600}>
                               {weatherData.wind.speed} m/s
                             </Typography>
                           </Box>
-                          <Box display="flex" justifyContent="space-between">
-                            <Typography variant="body1" fontWeight="bold">
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography
+                              variant="body1"
+                              fontWeight={500}
+                              color="text.secondary"
+                            >
                               Feels like:
                             </Typography>
-                            <Typography variant="body1">
+                            <Typography variant="h6" fontWeight={600}>
                               {Math.round(weatherData.main.feels_like)}°C
                             </Typography>
                           </Box>
@@ -385,6 +482,86 @@ const CountryPage = () => {
                       </Grid>
                     </Grid>
                   )}
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        )}
+
+        {/* Bordering Countries Section */}
+        {borderingCountries.length > 0 && (
+          <Grid container spacing={4} sx={{ mt: 2 }}>
+            <Grid size={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h5" gutterBottom>
+                    Bordering Countries ({borderingCountries.length})
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+
+                  <Grid container spacing={2}>
+                    {borderingCountries.map((borderCountry) => (
+                      <Grid
+                        size={{ xs: 12, sm: 6, md: 4 }}
+                        key={borderCountry.cca3}
+                      >
+                        <Card
+                          sx={{
+                            cursor: "pointer",
+                            transition: "transform 0.2s, box-shadow 0.2s",
+                            "&:hover": {
+                              transform: "translateY(-2px)",
+                              boxShadow: 3,
+                            },
+                          }}
+                          onClick={() =>
+                            handleBorderCountryClick(borderCountry.name.common)
+                          }
+                        >
+                          <CardContent sx={{ p: 2 }}>
+                            <Box display="flex" alignItems="center" gap={2}>
+                              <Box
+                                sx={{
+                                  width: 60,
+                                  height: 40,
+                                  position: "relative",
+                                  flexShrink: 0,
+                                  borderRadius: "4px",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <Image
+                                  fill
+                                  style={{
+                                    objectFit: "cover",
+                                  }}
+                                  src={
+                                    borderCountry.flags?.svg ||
+                                    borderCountry.flags?.png
+                                  }
+                                  alt={`Flag of ${borderCountry.name?.common}`}
+                                />
+                              </Box>
+                              <Box>
+                                <Typography
+                                  variant="subtitle1"
+                                  fontWeight="bold"
+                                >
+                                  {borderCountry.name.common}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {borderCountry.capital?.[0] || "No capital"}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </CardContent>
               </Card>
             </Grid>
