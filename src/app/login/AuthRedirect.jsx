@@ -9,7 +9,7 @@ export const AuthRedirect = () => {
 
     useEffect(() => {
         if (user) {
-            router.push("/protected");
+            router.push("/countries");
         }
     }, [user, router]);
 

@@ -11,7 +11,7 @@ Check out the deployed app: [Countries Next.js App](https://countries-nextjs-rea
 - Search countries
 - View country details
 - Add countries to favourites (Supabase auth)
-- Google login (Supabase)
+- Email/password and Google login (Supabase)
 - Weather info (OpenWeather API)
 - Light/dark theme toggle
 - Sticky header and footer with app name and tagline
