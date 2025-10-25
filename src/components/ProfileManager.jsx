@@ -11,7 +11,6 @@ import {
 } from "@/lib/features/profile/profileSlice";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import {
   Alert,
   Avatar,
@@ -23,6 +22,7 @@ import {
   IconButton,
   TextField,
   Typography,
+// ...existing code...
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,7 +35,7 @@ const ProfileManager = () => {
   const updating = useSelector(selectProfileUpdating);
   const error = useSelector(selectProfileError);
 
-  const [isEditing, setIsEditing] = useState(false);
+// ...existing code...
   const [formData, setFormData] = useState({
     username: "",
     display_name: "",
@@ -43,6 +43,7 @@ const ProfileManager = () => {
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -224,32 +225,41 @@ const ProfileManager = () => {
           </Box>
 
           <TextField
-            label="Display Name"
-            value={formData.display_name}
-            onChange={handleInputChange("display_name")}
-            disabled={!isEditing}
-            fullWidth
-            helperText="Your public display name"
+          id="display-name"
+          name="display_name"
+          label="Display Name"
+          value={formData.display_name}
+          onChange={handleInputChange("display_name")}
+          disabled={!isEditing}
+          fullWidth
+          helperText="Your public display name"
+          autoComplete="name"
           />
 
           <TextField
-            label="Username"
-            value={formData.username}
-            onChange={handleInputChange("username")}
-            disabled={!isEditing}
-            fullWidth
-            helperText="Unique username (letters, numbers, hyphens, underscores only)"
+          id="username"
+          name="username"
+          label="Username"
+          value={formData.username}
+          onChange={handleInputChange("username")}
+          disabled={!isEditing}
+          fullWidth
+          helperText="Unique username (letters, numbers, hyphens, underscores only)"
+          autoComplete="username"
           />
 
           <TextField
-            label="Bio"
-            value={formData.bio}
-            onChange={handleInputChange("bio")}
-            disabled={!isEditing}
-            fullWidth
-            multiline
-            rows={3}
-            helperText="Tell others about yourself"
+          id="bio"
+          name="bio"
+          label="Bio"
+          value={formData.bio}
+          onChange={handleInputChange("bio")}
+          disabled={!isEditing}
+          fullWidth
+          multiline
+          rows={3}
+          helperText="Tell others about yourself"
+          autoComplete="off"
           />
 
           <input
