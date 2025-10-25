@@ -20,6 +20,7 @@ Check out the deployed app: [Countries Next.js App](https://countries-nextjs-rea
 - Accessibility improvements
 - My Profile page
 - Edit profile (display name, username, bio, avatar)
+- Correct user routing (landing, login, logout, authentication required for profile and favourites)
 
 ## Getting Started
 
