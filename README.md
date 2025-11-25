@@ -1,114 +1,91 @@
-# Countries Next.js App
+# Countries App – Next.js Project
 
-This is a personalized countries explorer app built with Next.js, React, Redux Toolkit, Supabase, and Material-UI. It allows users to search, filter, and view details about countries, with features like authentication, favourites, weather info, and theme switching.
+A personalized countries explorer app built with **Next.js**, **React**, **Redux Toolkit**, **Supabase**, and **Material-UI**.  
+This project was developed as part of a course assignment.  
+> Initial project structure was provided by the instructor, and I implemented most UI features, search, filtering, routing, authentication flows, and dynamic content.
 
-## Live Demo
+---
 
-Check out the deployed app: [Countries Next.js App](https://countries-nextjs-react25k-ruddy.vercel.app/)
+## 🚀 Features Implemented
 
-## Features
-
-- Search countries
-- View country details
-- Add countries to favourites (Supabase auth)
-- Email/password and Google login (Supabase)
+- Search countries by name  
+- Filter countries by region  
+- View country details  
+- Favourites with Supabase authentication  
+- Email/password and Google login  
+- Light/dark theme toggle  
+- Sticky header & footer  
+- User profile & edit profile (display name, username, avatar)  
+- Dynamic routing & protected routes
 - Weather info (OpenWeather API)
-- Light/dark theme toggle
-- Sticky header and footer with app name and tagline
-- Custom favicon
-- Favourites analytics
-- Accessibility improvements
-- My Profile page
-- Edit profile (display name, username, bio, avatar)
-- Correct user routing (landing, login, logout, authentication required for profile and favourites)
+- Favourites analytics  
 
-## Getting Started
+---
 
-1. **Clone the repository:**
+## 🛠️ Tech Stack
+
+- **Next.js 14**  
+- **React**  
+- **Redux Toolkit**  
+- **Supabase**  
+- **Material-UI / Custom CSS**  
+- **Axios** (API requests)
+
+---
+
+## 📸 Screenshots
+
+![Home Page](screenshots/home.jpeg)  
+![Country Details](screenshots/details.jpeg)  
+![Profile Page](screenshots/profile.png)
+
+---
+
+## ▶️ Getting Started
+
+1. Clone the repository  
 	```bash
 	git clone https://github.com/TJsohn/countries-nextjs-react25k.git
 	cd countries-nextjs-react25k
 	```
 
-2. **Install dependencies:**
+2. Install dependencies
 	```bash
 	npm install
 	# or
 	yarn install
 	```
 
-3. **Set up environment variables:**
-	- Copy `.env.example` to `.env`:
-	  ```bash
-	  cp .env.example .env
-	  ```
-	- Fill in your own values for:
-	  - `NEXT_PUBLIC_SUPABASE_URL`
-	  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-	  - `NEXT_PUBLIC_OPENWEATHERAPI`
-	  - `SUPABASE_SERVICE_ROLE_KEY` (do not share this publicly)
-
-	> **Note:** For assignment review, you may request demo credentials from the author or use your own Supabase/OpenWeather accounts.
-
-4. **Run the development server:**
+3. Run the development server
 	```bash
 	npm run dev
 	# or
 	yarn dev
 	```
-	Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Project Structure
+Open http://localhost:3000￼ in your browser
 
-- `src/app/` — Next.js app router, pages, layout, providers
-- `src/lib/` — Redux store, slices, Supabase client
-- `public/` — Static assets, favicon, logo
+Note: Supabase/OpenWeather keys are required for full functionality. You may use your own API keys or request demo credentials from the author.
 
-## Environment Variables
+## 🔍 My Contributions
+	•	Implemented UI/UX according to mockups
+	•	Built search, filtering, and dynamic routing
+	•	Integrated Supabase authentication for favourites
+	•	Developed profile management features
+	•	Ensured responsive design across devices
+	•	Structured code for maintainability and reusability
 
-See `.env.example` for required variables. **Do not commit your real `.env` file.**
+⸻
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
-NEXT_PUBLIC_OPENWEATHERAPI=your_openweather_api_key_here
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-```
+## 🌐 Live Demo
 
-## Assignment Notes
+[Countries Next.js App](https://countries-nextjs-react25k-ruddy.vercel.app/)(deployed version)
 
-- All sensitive keys are excluded from the repository.
-- For full functionality, reviewers should add their own API keys to `.env`.
-- Contact the author privately for demo credentials if needed.
+⸻
 
-## License
-
-This project is for educational purposes.
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Additional Libraries & Justification
-
-- **Next.js**: Used for file-based routing, server-side rendering, and API routes. It simplifies development and improves performance compared to plain React.
-- **axios**: Used for HTTP requests to external APIs (e.g., OpenWeather). Chosen for its simple and consistent API.
-- **@fontsource/roboto**: Used to provide the Roboto font for a modern, clean UI consistent with Material-UI design.
-- **recharts**: Used for rendering analytics charts in the favourites analytics feature. Chosen for its ease of use and integration with React.
+## 💡 What I Learned
+	•	Advanced Next.js routing and dynamic pages
+	•	React state management with Redux Toolkit
+	•	API integration & authentication flows
+	•	Responsive UI design & theme toggling
+	•	Writing clean, maintainable front-end code
