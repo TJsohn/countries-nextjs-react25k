@@ -284,19 +284,19 @@ const CountryPage = () => {
                   gap={3}
                 >
                   <Image
-                    width={300}
-                    height={200}
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      border: "1px solid #ddd",
-                      width: "auto",
-                      height: "auto",
-                    }}
                     src={
                       selectedCountry.flags?.svg || selectedCountry.flags?.png
                     }
                     alt={`Flag of ${selectedCountry.name?.common}`}
+                    width={300} // Set a fixed width
+                    height={200} // Set a fixed height
+                    style={{
+                      objectFit: "contain", // Ensure the flag fits without distortion
+                      borderRadius: "8px", // Optional: Add rounded corners
+                      border: "1px solid #ddd", // Optional: Add a border for better visibility
+                      maxWidth: "100%", // Ensure responsiveness
+                      height: "auto", // Maintain aspect ratio
+                    }}
                     priority
                   />
                   <Box textAlign="center">
